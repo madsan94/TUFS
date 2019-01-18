@@ -7,17 +7,21 @@ var Issues = require('../Models/Issues');
 var uniqid = require('uniqid');
 var Order = require('../Models/Order')
 
-var json = {session: "none",
+
+//Response JSON
+var Response = {session: "none",
 				role:"none",
 				flag: "f",
 				message: "none"};
 
+//Function which refreshes the Response
 function refreshJson(){
 	Response = {session: "none",
 			   flag: "f",
 			   message: "none"};
 }
 
+//HOME
 module.exports = function(app, db) {
 app.get('/', (req, res)=> {
 	console.log(res.status)
@@ -26,6 +30,8 @@ app.get('/', (req, res)=> {
 
 	
 // Models and Issues
+// Request Params{device}
+//Respond with Models,Issues and respective Price 
 	app.post('/models',(req,res)=>{
 	refreshJson()
 	console.log(req.body.device)
@@ -61,9 +67,9 @@ app.get('/', (req, res)=> {
 		res.send(Response)
 	}
 	});
-	
-	//Forget password
-	app.post('/change_password',(req,res)=>{
+//===========================================================================================	
+//Forget password
+app.post('/change_password',(req,res)=>{
 		refreshJson()
 		sess=req.body.session
 		if(sess.email){
@@ -116,12 +122,13 @@ app.get('/', (req, res)=> {
 					}
 		});
 		})
-		
-		// Login-Session homepage
-		app.post('/login',(req,res)=>{
-			refreshJson()
-			Response["check_vehicle"]='f'
-		console.log(req.body.email)
+
+//===========================================================================================		
+// Login 
+app.post('/login',(req,res)=>{
+	refreshJson()
+	Response["check_vehicle"]='f'
+	console.log(req.body.email)
 		var email_flag=validator.validate(req.body.email);
 		var sess=req.session;
 		sess.email=req.body.email
@@ -156,15 +163,22 @@ app.get('/', (req, res)=> {
 			res.send(Response)
 		}
 		});
-app.post('/orders',(req,res)=>{//{type,device,price,issue}
+
+
+
+//Takes an Order and Place and Order
+//Request Params:{type,device,price,issue}-> while Posting 
+//Request Params:{status:O/P/D} as per Ordered,Pending(assigned to staff),Done
+//Can Request by Filters-> extra flexibiity for sorting 		
+app.post('/orders',(req,res)=>{
 		refreshJson()
 		console.log(req.body.device)
 		var sess=req.session;
+		if(type=='POST'){
 		//type: POST -> Post a Order
 		//type: GET  -> Get all orders based on the role
 		type=req.body.type
-		Order_type=req.body.device
-		if(type=='POST'){
+		Order_type=req.body.device	
 		if(sess){
 		order_number=uniqid()
 		var order_data={
