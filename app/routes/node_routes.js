@@ -1,13 +1,40 @@
 var validator = require("email-validator");
 var fs = require("fs");
+const SendOtp = require('sendotp');
 var mongoose = require('mongoose');
 var Users = require('../Models/Users');
 var Models = require('../Models/Models');
 var Issues = require('../Models/Issues');
+var otp = require('../Models/otp');
 var uniqid = require('uniqid');
 var Order = require('../Models/Order')
+const sendOtp = new SendOtp('257484AxC4Y6P715c431733', 'Otp for your order in Alam Solutions is {{otp}}, please do not share it with anybody');
 
 
+//Generate OTP Function
+function GenerateOtp(){
+	return(Math.floor(100000 + Math.random() * 900000))
+
+}
+
+function RemoveOTP(){
+
+	otp.remove({number:req.body.number},function(err, data) {
+		if(err)
+		console.log(err)
+		else
+			console.log(data)
+		})
+//Save Number with null otp
+var otp =new otp(opt_data_updated)			
+otp.save(function(err, data) {
+		if(err)
+		console.log(err)
+		else
+			console.log(data)
+		})	
+	
+}
 //Response JSON
 var Response = {session: "none",
 				role:"none",
@@ -91,16 +118,17 @@ app.post('/change_password',(req,res)=>{
 		console.log(res.status)
 			res.render('index.html');
 		});
-	
-		app.post('/signup', (req, res) => {
-			refreshJson()
-			console.log(req.body)
-			var user_data = {
-			a_name: req.body.name,
-			a_email: req.body.email,
-			a_password:req.body.password,
-			a_role: req.body.role
-				};
+//=====================================================================================
+//SIGNUP	
+app.post('/signup', (req, res) => {
+		refreshJson()
+		console.log(req.body)
+		var user_data = {
+		a_name: req.body.name,
+		a_email: req.body.email,
+		a_password:req.body.password,
+		a_role: req.body.role
+			};
 		
 		var user = new Users(user_data);
 		user.save( function(error, data){
@@ -123,11 +151,48 @@ app.post('/change_password',(req,res)=>{
 		});
 		})
 
+app.post('/send_otp',(req,res)=>{
+	refreshJson()
+	var otp=GenerateOtp()
+	mobile_number=req.body.number
+	//var otp=new otp(otp_data) 
+	
+	sendOtp.send(mobile_number,otp, function (error, data) {
+		if(error){
+			console.log(error)
+			sendOtp.retry(contactNumber, false, callback);
+		}
+		else{
+			console.log(data)
+			Response['flag']='s'
+			Response['message']='OTP Generated Succesfully'
+			res.send(Response)
+		}
+	  });
+	
+})
+
+app.post('/verify_otp',(req,res)=>{
+	sendOtp.verify(req.body.number, req.body.otp, function (error, data) {
+		console.log(data); // data object with keys 'message' and 'type'
+		if(data.type == 'success') 
+		{
+			Response['flag']='s'
+			Response['message']="User Verified Successfully"
+		}
+		if(data.type == 'error')
+		{
+			Response['flag']='f'
+			Response['message']="User Not Verified"
+		}
+	  });
+	})
+
+
 //===========================================================================================		
 // Login 
 app.post('/login',(req,res)=>{
 	refreshJson()
-	Response["check_vehicle"]='f'
 	console.log(req.body.email)
 		var email_flag=validator.validate(req.body.email);
 		var sess=req.session;
