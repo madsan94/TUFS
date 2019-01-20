@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {FormControl} from '@angular/forms';
+import { FormControl } from '@angular/forms';
+
 
 @Component({
   selector: 'app-drop-down',
@@ -12,8 +13,6 @@ export class DropDownComponent implements OnInit {
 
   ngOnInit() {
   }
- 
-myControl = new FormControl();
-options: string[] = ['One', 'Two', 'Three'];
-
+  myControl = new FormControl();
+  options: string[] = ['One', 'Two', 'Three'];
 }

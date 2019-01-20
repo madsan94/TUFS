@@ -1,0 +1,39 @@
+<header>
+  <h1>Register To TUFS</h1>
+</header>
+
+<form 
+[formGroup]="form"
+(ngSubmit)="onSubmit(form.value)">
+<ul>
+  <li>
+    <label for="name">Name</label>
+    <input type="text" name="name" id="name" formControlName="name">
+    <div *ngIf="form.get('name').hasError('pattern')">
+      Provide Valid Name
+    </div>
+</li>
+<li>
+  <label for="email">Email ID</label>
+  <input type="text" name="email" id="email" formControlName="email">
+  <div *ngIf="form.get('email').hasError('pattern')">
+    Provide Valid Email Address
+  </div>
+</li>
+<li>
+  <label for="password">Choose a Password</label>
+  <input type="text" name="password" id="password" formControlName="password">
+  <div *ngIf="form.get('password').hasError('pattern')">
+    Password Must Contain one Caps and a Numeric Character
+  </div>
+</li>
+<li>
+  <label for="confirm_password">Confirm Your Password</label>
+  <input type="text" name="confirm_password" id="confirm_password" formControlName="confirm_password">
+  <div *ngIf="form.get('confirm_password').hasError('pattern')">
+    Does not match
+  </div>
+</li>
+</ul>
+<button type="submit" [disabled]="!form.valid">Register</button>
+</form>
